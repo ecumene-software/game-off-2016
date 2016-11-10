@@ -7,6 +7,6 @@ import ecu.silicon.SiliconTycoon;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new SiliconTycoon(), config);
+		new LwjglApplication(SiliconTycoon.INSTANCE = new SiliconTycoon(), config);
 	}
 }

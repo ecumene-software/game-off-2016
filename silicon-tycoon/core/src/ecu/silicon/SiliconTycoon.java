@@ -1,33 +1,35 @@
 package ecu.silicon;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import ecu.silicon.screens.STMenuScreen;
 
-public class SiliconTycoon extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
-	
+public class SiliconTycoon extends Game {
+	public static SiliconTycoon INSTANCE;
+
+	public STRepository repository;
+	public SpriteBatch batch;
+
+	public SiliconTycoon(){
+		repository = new STRepository();
+	}
+
 	@Override
-	public void create () {
+	public void create() {
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		repository.loadAll();
+
+		setScreen(new STMenuScreen());
 	}
 
 	@Override
-	public void render () {
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
-	}
-	
-	@Override
-	public void dispose () {
+	public void dispose() {
+		super.dispose();
 		batch.dispose();
-		img.dispose();
+		repository.dispose();
+	}
+
+	public static SiliconTycoon getInstance(){
+		return INSTANCE;
 	}
 }

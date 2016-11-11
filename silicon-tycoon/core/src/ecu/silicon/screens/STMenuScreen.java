@@ -18,8 +18,8 @@ public class STMenuScreen implements Screen {
     private float logoY = 800;
     private float x;
 
-    private TextureRegion serverRegion = new TextureRegion(SiliconTycoon.getInstance().repository.server_background);
-    private TextureRegion grassRegion  = new TextureRegion(SiliconTycoon.getInstance().repository.grass_background);
+    private TextureRegion serverRegion   = new TextureRegion(SiliconTycoon.getInstance().repository.server_background);
+    private TextureRegion grassRegion    = new TextureRegion(SiliconTycoon.getInstance().repository.grass_background);
 
     @Override
     public void render(float delta) {
@@ -29,6 +29,7 @@ public class STMenuScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         logoY += ((-SiliconTycoon.getInstance().repository.logo.getHeight()/2 + 150) - logoY) * 3f * delta;
+        float logoYAnim = logoY - (-SiliconTycoon.getInstance().repository.logo.getHeight()/2 + 150);
 
         serverRegion.setRegionWidth(Gdx.graphics.getWidth());
         grassRegion.setRegionWidth(Gdx.graphics.getWidth());
@@ -38,7 +39,10 @@ public class STMenuScreen implements Screen {
         SiliconTycoon.getInstance().batch.begin();
         SiliconTycoon.getInstance().batch.draw(serverRegion, -Gdx.graphics.getWidth()/2,0);
         SiliconTycoon.getInstance().batch.draw(grassRegion,  -Gdx.graphics.getWidth()/2,-Gdx.graphics.getHeight()/2);
-        SiliconTycoon.getInstance().batch.draw(SiliconTycoon.getInstance().repository.logo, -SiliconTycoon.getInstance().repository.logo.getWidth()/2, logoY);
+        SiliconTycoon.getInstance().batch.draw(SiliconTycoon.getInstance().repository.logo,            -SiliconTycoon.getInstance().repository.logo.getWidth()/2, logoY);
+        SiliconTycoon.getInstance().batch.draw(SiliconTycoon.getInstance().repository.play_button,     -SiliconTycoon.getInstance().repository.play_button.getWidth()/4,     -((logoYAnim*1.2f)), SiliconTycoon.getInstance().repository.play_button.getWidth()/2, SiliconTycoon.getInstance().repository.play_button.getHeight()/2);
+        SiliconTycoon.getInstance().batch.draw(SiliconTycoon.getInstance().repository.continue_button, -SiliconTycoon.getInstance().repository.continue_button.getWidth()/4, -((logoYAnim*1.8f) + 50), SiliconTycoon.getInstance().repository.continue_button.getWidth()/2, SiliconTycoon.getInstance().repository.continue_button.getHeight()/2);
+        SiliconTycoon.getInstance().batch.draw(SiliconTycoon.getInstance().repository.quit_button,     -SiliconTycoon.getInstance().repository.quit_button.getWidth()/4,     -((logoYAnim*2.4f) + 100), SiliconTycoon.getInstance().repository.quit_button.getWidth()/2, SiliconTycoon.getInstance().repository.quit_button.getHeight()/2);
         SiliconTycoon.getInstance().batch.end();
 
         x += 40f * delta;

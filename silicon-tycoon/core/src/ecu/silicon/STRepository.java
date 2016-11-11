@@ -11,6 +11,8 @@ public class STRepository {
         logo = new Texture("logo.png");
         server_background = new Texture("server-rack.png");
         grass_background = new Texture("grass.png");
+        server_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        grass_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
     }
 
     public void dispose(){

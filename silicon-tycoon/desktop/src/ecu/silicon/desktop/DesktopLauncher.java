@@ -7,6 +7,9 @@ import ecu.silicon.SiliconTycoon;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.width  = 800;
+		config.height = 600;
+		config.title  = "Silicon Tycoon";
 		new LwjglApplication(SiliconTycoon.INSTANCE = new SiliconTycoon(), config);
 	}
 }

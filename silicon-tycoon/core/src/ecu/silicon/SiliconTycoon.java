@@ -4,8 +4,15 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.kotcrab.vis.ui.VisUI;
-import ecu.silicon.screens.game.STGameScreen;
+import ecu.silicon.models.STSaveState;
+import ecu.silicon.screens.STGameScreen;
 import ecu.silicon.screens.STMenuScreen;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class SiliconTycoon extends Game {
 	public static SiliconTycoon INSTANCE;
@@ -25,15 +32,13 @@ public class SiliconTycoon extends Game {
         batch = new SpriteBatch();
 		repository.loadAll();
 		VisUI.load(Gdx.files.local("gui/theme/tinted.json"));
-		menuScreen = new STMenuScreen();
-		gameScreen = new STGameScreen(new STSaveState("Mitchell"));
-
-		setScreen(menuScreen);
+		setScreen(menuScreen = new STMenuScreen());
 	}
 
 	@Override
 	public void dispose() {
 		super.dispose();
+        getScreen().dispose();
 		batch.dispose();
 		VisUI.dispose();
 		repository.dispose();

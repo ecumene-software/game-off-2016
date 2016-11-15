@@ -15,6 +15,10 @@ import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import ecu.silicon.SiliconTycoon;
+import ecu.silicon.models.STSaveState;
+
+import java.io.File;
+import java.io.IOException;
 
 public class STMenuScreen implements Screen {
 
@@ -38,7 +42,7 @@ public class STMenuScreen implements Screen {
     private Stage stage;
     private boolean visUIOpen = false;
 
-    public STMenuScreen(){
+    public STMenuScreen() {
         stage = new Stage(new ScreenViewport());
         input = new InputProcessor() {
             private int in = 0;
@@ -50,7 +54,13 @@ public class STMenuScreen implements Screen {
             @Override public boolean touchUp(int screenX, int screenY, int pointer, int button) {
                 if(!visUIOpen){
                     switch (in){
-                        case 1:SiliconTycoon.getInstance().setScreen(SiliconTycoon.getInstance().gameScreen); break;
+                        case 1:{
+                            try{
+                                SiliconTycoon.getInstance().setScreen(SiliconTycoon.getInstance().gameScreen = new STGameScreen(STSaveState.fromJSON(new File("save.json")), false));
+                            } catch (IOException e){
+                                e.printStackTrace();
+                            }
+                        } break;
                         case 2:openSaves(); break;
                         case 3:Gdx.app.exit(); break;
                     }

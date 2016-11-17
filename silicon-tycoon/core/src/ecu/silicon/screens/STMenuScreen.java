@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -11,9 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.kotcrab.vis.ui.widget.VisTable;
-import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.kotcrab.vis.ui.widget.VisWindow;
+import com.kotcrab.vis.ui.widget.*;
 import ecu.silicon.SiliconTycoon;
 import ecu.silicon.models.STSaveState;
 
@@ -42,6 +41,8 @@ public class STMenuScreen implements Screen {
     private Stage stage;
     private boolean visUIOpen = false;
 
+    private FileHandle savesDirectory = new FileHandle("saves/");
+
     public STMenuScreen() {
         stage = new Stage(new ScreenViewport());
         input = new InputProcessor() {
@@ -55,11 +56,26 @@ public class STMenuScreen implements Screen {
                 if(!visUIOpen){
                     switch (in){
                         case 1:{
-                            try{
-                                SiliconTycoon.getInstance().setScreen(SiliconTycoon.getInstance().gameScreen = new STGameScreen(STSaveState.fromJSON(new File("save.json")), false));
-                            } catch (IOException e){
-                                e.printStackTrace();
-                            }
+                            final VisTextField username = new VisTextField();
+                            final VisTextField saveName = new VisTextField();
+                            VisTextButton createButton = new VisTextButton("Create");
+
+                            createButton.addListener(new ClickListener(){
+                                @Override
+                                public void clicked(InputEvent event, float x, float y) {
+                                    super.clicked(event, x, y);
+                                    STSaveState newState = new STSaveState(username.getText(), saveName.getText()).timestamp();
+                                    openGame(newState, true);
+                                }
+                            });
+                            VisWindow usernameWindow = new VisWindow("New Game");
+                            usernameWindow.add(new VisLabel("username:"));
+                            usernameWindow.add(username).row();
+                            usernameWindow.add(new VisLabel("save location:"));
+                            usernameWindow.add(saveName).row();
+                            usernameWindow.add(createButton);
+                            usernameWindow.setSize(300, 200);
+                            stage.addActor(usernameWindow);
                         } break;
                         case 2:openSaves(); break;
                         case 3:Gdx.app.exit(); break;
@@ -88,6 +104,11 @@ public class STMenuScreen implements Screen {
             @Override public boolean scrolled(int amount) {return false;}
         };
         Gdx.input.setInputProcessor(new InputMultiplexer(getInputProcessor(), stage));
+    }
+
+    private void openGame(STSaveState state, boolean firstTime){
+        SiliconTycoon.getInstance().setScreen(SiliconTycoon.getInstance().gameScreen = new STGameScreen(state.timestamp(), firstTime));
+        SiliconTycoon.getInstance().gameScreen.postConstruct();
     }
 
     @Override

@@ -25,12 +25,11 @@ public class STSaveWriter {
 
     public void write(STSaveState state) throws IOException{
         if(target.isDirectory()) throw new IllegalArgumentException("Save file cannot be a directory");
-        if(!target.exists()) {
-            if(target.file().getParentFile() != null)
-                if(!target.file().getParentFile().mkdirs()) throw new IOException("Couldn't make save file's parent directories, perhaps a permission error?"); // Makes the file's parent dir
-            if(!target.file().createNewFile())              throw new IOException("Couldn't make save file, perhaps a permission error?");
+        String realPath = target.path();
+        if(!target.file().getName().toLowerCase().endsWith(".json")){
+            realPath = realPath + ".json";
         }
-        FileUtils.write(target.file(), state.toJSON(), Charset.forName("UTF-8"));
+        FileUtils.write(new File("saves/" + realPath), state.toJSON(), Charset.forName("UTF-8"));
     }
 
 }

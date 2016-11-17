@@ -23,6 +23,8 @@ public class SiliconTycoon extends Game {
 	public STMenuScreen menuScreen;
 	public STGameScreen gameScreen;
 
+	public String gameDirectory = "./";
+
 	public SiliconTycoon(){
 		repository = new STRepository();
 	}

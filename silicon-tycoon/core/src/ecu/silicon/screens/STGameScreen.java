@@ -10,17 +10,22 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisScrollPane;
+import ecu.silicon.gui.AdviceVisTable;
+import ecu.silicon.gui.AdviceWindow;
 import ecu.silicon.models.STSaveState;
 import ecu.silicon.SiliconTycoon;
-import ecu.silicon.alerts.Alert;
-import ecu.silicon.alerts.AlertsVisTable;
+import ecu.silicon.models.advisors.Advice;
+import ecu.silicon.models.advisors.BuisnessAdvisor;
+import ecu.silicon.models.advisors.LegalAdvisor;
+import ecu.silicon.models.advisors.TechAdvisor;
+import ecu.silicon.models.alerts.Alert;
+import ecu.silicon.gui.AlertsVisTable;
 import ecu.silicon.gui.AlertsWindow;
 import ecu.silicon.models.STSaveWriter;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class STGameScreen implements Screen {
 
@@ -34,20 +39,18 @@ public class STGameScreen implements Screen {
     private boolean      firstTime;
 
     private STSaveState state;
-    private STSaveWriter writing;
+
+    private LegalAdvisor    legalAdvisor;
+    private BuisnessAdvisor buisnessAdvisor;
+    private TechAdvisor     techAdvisor;
 
     public STGameScreen(STSaveState save, boolean firstTime) {
         this.state = save;
-        this.writing = new STSaveWriter(new File("save.json"));
 
         this.firstTime = firstTime;
         gui = new Stage(new ScreenViewport());
 
         alertsGUI = new AlertsVisTable();
-        state.alerts.add(new Alert("Hey! Listen!"));
-        state.alerts.add(new Alert("Hey! Listen!"));
-        state.alerts.add(new Alert("Hey! Listen!"));
-        state.alerts.add(new Alert("Hey! Listen!"));
         alertsGUI.update(state.alerts);
 
         alertsWindow = new AlertsWindow("Alerts", new Vector2(), new Vector2(100, 100));
@@ -73,6 +76,37 @@ public class STGameScreen implements Screen {
         };
         closeAlerts();
         alertsWindow.setVisible(false);
+
+        techAdvisor = new TechAdvisor();
+        buisnessAdvisor = new BuisnessAdvisor();
+        legalAdvisor = new LegalAdvisor();
+
+        techAdvisor.initSubscribe();
+        buisnessAdvisor.initSubscribe();
+        legalAdvisor.initSubscribe();
+    }
+
+    public void postConstruct(){
+        getTechAdvisor().advise("Greetings! I scope out the competition, and give you advice on tech stuff. I must say I'm very excited to get this thing going!");
+        getLegalAdvisor().advise("Hello, I'll let you know if you get into any trouble. I'm here to help... At a price, of course.");
+        getBuisnessAdvisor().advise("Hya. Im your assistant for financial, commerce, and construction conflicts. You'll hear from me when you need me.");
+    }
+
+    public void postAdvice(Advice advice){
+        VisLabel escToClose = new VisLabel("Press escape to close");
+        escToClose.setColor(0.5f, 0.5f, 0.5f, 0.5f);
+        escToClose.setFontScale(1f);
+
+        AdviceWindow adviceWindow = new AdviceWindow("Advice from your " + advice.parent.getType() + " advisor:", new Vector2(), new Vector2(100, 100));
+        adviceWindow.add(new AdviceVisTable(advice)).grow().row();
+        adviceWindow.add(escToClose);
+        adviceWindow.setKeepWithinParent(false);
+        adviceWindow.setKeepWithinStage(false);
+        adviceWindow.addCloseButton();
+        adviceWindow.closeOnEscape();
+        adviceWindow.setSize(450, 200);
+
+        gui.addActor(adviceWindow);
     }
 
     @Override
@@ -135,11 +169,26 @@ public class STGameScreen implements Screen {
 
     }
 
+    public BuisnessAdvisor getBuisnessAdvisor() {
+        return buisnessAdvisor;
+    }
+
+    public LegalAdvisor getLegalAdvisor() {
+        return legalAdvisor;
+    }
+
+    public TechAdvisor getTechAdvisor() {
+        return techAdvisor;
+    }
+
     @Override
     public void dispose() {
+        techAdvisor.initUnsubscribe();
+        buisnessAdvisor.initUnsubscribe();
+        legalAdvisor.initUnsubscribe();
+
         try{
-            writing.write(state);
-            System.out.println("Writing to " + writing.target.file().getName());
+            STSaveState.save(state);
         } catch (Exception e){
             e.printStackTrace();
         }

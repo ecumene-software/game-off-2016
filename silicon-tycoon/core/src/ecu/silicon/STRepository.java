@@ -9,6 +9,9 @@ public class STRepository {
     public Texture play_button;
     public Texture quit_button;
     public Texture saves_button;
+    public Texture advisor_legal;
+    public Texture advisor_buisness;
+    public Texture advisor_tech;
 
     public void loadAll(){
         logo                  = new Texture("gui/logo.png");
@@ -17,6 +20,9 @@ public class STRepository {
         play_button           = new Texture("gui/menu/play.png");
         saves_button          = new Texture("gui/menu/saves.png");
         quit_button           = new Texture("gui/menu/quit.png");
+        advisor_legal         = new Texture("advisors/legal.png");
+        advisor_buisness      = new Texture("advisors/buisness.png");
+        advisor_tech          = new Texture("advisors/tech.png");
 
         server_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         buildings_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);

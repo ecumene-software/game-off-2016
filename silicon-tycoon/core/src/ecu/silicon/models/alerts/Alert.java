@@ -1,4 +1,4 @@
-package ecu.silicon.alerts;
+package ecu.silicon.models.alerts;
 
 public class Alert {
     public String message;

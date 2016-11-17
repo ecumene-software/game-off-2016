@@ -11,9 +11,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.*;
 import ecu.silicon.SiliconTycoon;
+import ecu.silicon.gui.CenterVisWindow;
+import ecu.silicon.gui.CloseListener;
 import ecu.silicon.models.STSaveState;
 
 import java.io.File;
@@ -68,14 +71,23 @@ public class STMenuScreen implements Screen {
                                     openGame(newState, true);
                                 }
                             });
-                            VisWindow usernameWindow = new VisWindow("New Game");
+                            CenterVisWindow usernameWindow = new CenterVisWindow("New Game");
                             usernameWindow.add(new VisLabel("username:"));
                             usernameWindow.add(username).row();
                             usernameWindow.add(new VisLabel("save location:"));
                             usernameWindow.add(saveName).row();
                             usernameWindow.add(createButton);
                             usernameWindow.setSize(300, 200);
+                            usernameWindow.closeOnEscape();
+                            usernameWindow.addCloseButton();
+                            usernameWindow.setCloseListener(new CloseListener() {
+                                @Override
+                                public void onClose() {
+                                    visUIOpen = false;
+                                }
+                            });
                             stage.addActor(usernameWindow);
+                            visUIOpen = true;
                         } break;
                         case 2:openSaves(); break;
                         case 3:Gdx.app.exit(); break;
@@ -143,7 +155,7 @@ public class STMenuScreen implements Screen {
         x += 40f * delta;
     }
 
-    public void openSaves(){
+    public void openSaves() {
         visUIOpen = true;
         final VisWindow savesWindow = new VisWindow("Saves");
         savesWindow.setWidth(350);
@@ -161,11 +173,32 @@ public class STMenuScreen implements Screen {
                 visUIOpen = false;
             }
         });
+
         windowTable.addSeparator();
+        FileHandle saves = new FileHandle(SiliconTycoon.getInstance().gameDirectory + "saves/");
+        for(final FileHandle save : saves.list()){
+            VisTextButton play = new VisTextButton("Play");
+            play.addListener(new ClickListener(){
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    try{
+                        openGame(STSaveState.fromJSON(new File(SiliconTycoon.getInstance().gameDirectory + "saves/" + save.name())), false);
+                    } catch (IOException exception){
+                        exception.printStackTrace();;
+                    }
+                }
+            });
+            VisTable cell = new VisTable();
+            cell.add(play);
+            cell.add(new VisLabel(save.name())).align(Align.left).growX();
+
+            windowTable.add(cell).growX().row();
+            windowTable.addSeparator();
+        }
+
         windowTable.add(closeWindow);
-
         savesWindow.add(windowTable);
-
         stage.addActor(savesWindow);
     }
 

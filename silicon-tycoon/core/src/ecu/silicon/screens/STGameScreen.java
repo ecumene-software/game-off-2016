@@ -12,6 +12,9 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisScrollPane;
+import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
+import ecu.silicon.events.STEvent;
 import ecu.silicon.gui.AdviceVisTable;
 import ecu.silicon.gui.AdviceWindow;
 import ecu.silicon.models.STSaveState;
@@ -20,12 +23,9 @@ import ecu.silicon.models.advisors.Advice;
 import ecu.silicon.models.advisors.BuisnessAdvisor;
 import ecu.silicon.models.advisors.LegalAdvisor;
 import ecu.silicon.models.advisors.TechAdvisor;
-import ecu.silicon.models.alerts.Alert;
 import ecu.silicon.gui.AlertsVisTable;
 import ecu.silicon.gui.AlertsWindow;
-import ecu.silicon.models.STSaveWriter;
-
-import java.io.File;
+import ecu.silicon.models.alerts.Alert;
 
 public class STGameScreen implements Screen {
 
@@ -44,8 +44,11 @@ public class STGameScreen implements Screen {
     private BuisnessAdvisor buisnessAdvisor;
     private TechAdvisor     techAdvisor;
 
+    private Bus gameBus;
+
     public STGameScreen(STSaveState save, boolean firstTime) {
         this.state = save;
+        gameBus = new Bus(ThreadEnforcer.ANY);
 
         this.firstTime = firstTime;
         gui = new Stage(new ScreenViewport());
@@ -87,9 +90,19 @@ public class STGameScreen implements Screen {
     }
 
     public void postConstruct(){
-        getTechAdvisor().advise("Greetings! I scope out the competition, and give you advice on tech stuff. I must say I'm very excited to get this thing going!");
-        getLegalAdvisor().advise("Hello, I'll let you know if you get into any trouble. I'm here to help... At a price, of course.");
-        getBuisnessAdvisor().advise("Hya. Im your assistant for financial, commerce, and construction conflicts. You'll hear from me when you need me.");
+        if(firstTime) {
+            getTechAdvisor().advise("Greetings! I scope out the competition, and give you advice on tech stuff. I must say I'm very excited to get this thing going!");
+            getLegalAdvisor().advise("Hello, I'll let you know if you get into any trouble. I'm here to help... At a price, of course.");
+            getBuisnessAdvisor().advise("Hya. Im your assistant for financial, commerce, and construction conflicts. You'll hear from me when you need me.");
+        }
+        gameBus.post(new STEvent("POST_CONSTRUCT_GAME"));
+    }
+
+    public void postAlert(Alert alert){
+        state.alerts.add(alert);
+        alertsGUI.update(state.alerts);
+        openAlerts();
+        gameBus.post(alert);
     }
 
     public void postAdvice(Advice advice){
@@ -107,6 +120,7 @@ public class STGameScreen implements Screen {
         adviceWindow.setSize(450, 200);
 
         gui.addActor(adviceWindow);
+        gameBus.post(advice);
     }
 
     @Override
@@ -115,10 +129,6 @@ public class STGameScreen implements Screen {
 
         Gdx.gl.glClearColor(135f/255f, 206f/255f, 235f/255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        if(firstTime) {
-            // TODO: Setup Quicksave
-        }
 
         gui.act(delta);
         gui.draw();
@@ -147,6 +157,7 @@ public class STGameScreen implements Screen {
         alertsWindow.setTarget(new Vector2(Gdx.graphics.getWidth()+alertsWindow.getWidth(), Gdx.graphics.getHeight()/2 - alertsWindow.getHeight()/2));
         alertsWindow.bounce();
         alertsWindow.setDisabled(true);
+
     }
 
     @Override

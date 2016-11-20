@@ -15,6 +15,9 @@ public class STRepository {
     public Texture silicoin;
     public Texture whitedot;
     public Texture greydot;
+    public Texture slow;
+    public Texture quick;
+    public Texture pause;
 
     public void loadAll(){
         logo                  = new Texture("gui/logo.png");
@@ -29,6 +32,9 @@ public class STRepository {
         silicoin              = new Texture("silicoin.png");
         whitedot              = new Texture("white-dot.png");
         greydot               = new Texture("grey-dot.png");
+        slow                  = new Texture("slow.png");
+        quick                 = new Texture("quick.png");
+        pause                 = new Texture("pause.png");
 
         server_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         buildings_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);

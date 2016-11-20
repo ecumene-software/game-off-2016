@@ -210,7 +210,7 @@ public class STMenuScreen implements Screen {
     public void resize(int width, int height) {
         camera = new OrthographicCamera(width, height);
         camera.update();
-        stage.getViewport().update(width, height);
+        stage.getViewport().update(width, height, true);
     }
 
     @Override

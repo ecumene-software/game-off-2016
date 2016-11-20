@@ -20,6 +20,11 @@ public class STSaveState {
     public List<Alert> alerts;
     public String username;
 
+    public float stepTime;
+    public float stepMul;
+    public boolean quickTime;
+    public boolean pauseTime;
+
     @Deprecated
     public STSaveState(){
         alerts = new ArrayList<Alert>();

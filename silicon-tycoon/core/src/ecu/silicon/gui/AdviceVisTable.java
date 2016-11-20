@@ -9,10 +9,6 @@ public class AdviceVisTable extends VisTable {
         update(advice);
     }
 
-    public AdviceVisTable(){
-
-    }
-
     public void update(Advice advice){
         clear();
 

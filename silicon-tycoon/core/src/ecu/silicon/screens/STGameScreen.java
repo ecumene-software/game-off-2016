@@ -64,7 +64,8 @@ public class STGameScreen implements Screen {
 
         gui.addActor(alertsWindow);
 
-        gui.addActor(new TopBarActor("Test", 100, 100).setStyle(VisUI.getSkin().get("default", TopBarActor.TopBarStyle.class)));
+        final TopBarActor bar = new TopBarActor("Test", 100, 100).setStyle(VisUI.getSkin().get("default", TopBarActor.TopBarStyle.class));
+        gui.addActor(bar);
 
         gameInput = new InputAdapter(){
             @Override
@@ -74,6 +75,7 @@ public class STGameScreen implements Screen {
                     if(alertsWindow.isDisabled()) openAlerts();
                     else                          closeAlerts();
                 }
+                if(character == ' ') bar.togglePause();
                 return super.keyTyped(character);
             }
         };
@@ -130,6 +132,8 @@ public class STGameScreen implements Screen {
         Gdx.gl.glClearColor(135f/255f, 206f/255f, 235f/255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        this.state.stepTime += delta * getState().stepMul;
+
         gui.act(delta);
         gui.draw();
     }
@@ -158,6 +162,10 @@ public class STGameScreen implements Screen {
         alertsWindow.bounce();
         alertsWindow.setDisabled(true);
 
+    }
+
+    public STSaveState getState() {
+        return state;
     }
 
     @Override

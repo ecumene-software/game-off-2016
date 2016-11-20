@@ -10,21 +10,19 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisScrollPane;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 import ecu.silicon.events.STEvent;
-import ecu.silicon.gui.AdviceVisTable;
-import ecu.silicon.gui.AdviceWindow;
+import ecu.silicon.gui.*;
 import ecu.silicon.models.STSaveState;
 import ecu.silicon.SiliconTycoon;
 import ecu.silicon.models.advisors.Advice;
 import ecu.silicon.models.advisors.BuisnessAdvisor;
 import ecu.silicon.models.advisors.LegalAdvisor;
 import ecu.silicon.models.advisors.TechAdvisor;
-import ecu.silicon.gui.AlertsVisTable;
-import ecu.silicon.gui.AlertsWindow;
 import ecu.silicon.models.alerts.Alert;
 
 public class STGameScreen implements Screen {
@@ -65,6 +63,8 @@ public class STGameScreen implements Screen {
         alertsWindow.setKeepWithinStage(false);
 
         gui.addActor(alertsWindow);
+
+        gui.addActor(new TopBarActor("Test", 100, 100).setStyle(VisUI.getSkin().get("default", TopBarActor.TopBarStyle.class)));
 
         gameInput = new InputAdapter(){
             @Override

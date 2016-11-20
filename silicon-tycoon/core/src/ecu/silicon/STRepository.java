@@ -12,6 +12,9 @@ public class STRepository {
     public Texture advisor_legal;
     public Texture advisor_buisness;
     public Texture advisor_tech;
+    public Texture silicoin;
+    public Texture whitedot;
+    public Texture greydot;
 
     public void loadAll(){
         logo                  = new Texture("gui/logo.png");
@@ -23,6 +26,9 @@ public class STRepository {
         advisor_legal         = new Texture("advisors/legal.png");
         advisor_buisness      = new Texture("advisors/buisness.png");
         advisor_tech          = new Texture("advisors/tech.png");
+        silicoin              = new Texture("silicoin.png");
+        whitedot              = new Texture("white-dot.png");
+        greydot               = new Texture("grey-dot.png");
 
         server_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         buildings_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
@@ -35,5 +41,11 @@ public class STRepository {
         play_button.dispose();
         quit_button.dispose();
         saves_button.dispose();
+        advisor_buisness.dispose();
+        advisor_tech.dispose();
+        advisor_legal.dispose();
+        silicoin.dispose();
+        whitedot.dispose();
+        greydot.dispose();
     }
 }

@@ -267,4 +267,8 @@
         com.kotcrab.vis.ui.util.adapter.SimpleListAdapter$SimpleListAdapterStyle: {
         default: {background: window-bg, selection: list-selection }
         }
+
+        ecu.silicon.gui.TopBarActor$TopBarStyle: {
+        default: {barFont: default-font, background: window, barFontColor: white }
+        },
 }

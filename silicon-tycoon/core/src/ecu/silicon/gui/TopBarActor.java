@@ -12,11 +12,8 @@ import com.kotcrab.vis.ui.widget.VisImage;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import ecu.silicon.SiliconTycoon;
-import ecu.silicon.models.STSaveState;
 
 public class TopBarActor extends VisTable {
-    public int money;
-    public int time;
     public String buisnessName;
     public TopBarStyle style;
 
@@ -26,11 +23,9 @@ public class TopBarActor extends VisTable {
     private WeekdayDotImage t1,t2,t3,t4,t5;
     private VisImage slowTime, pauseTime, quickTime, timeState;
 
-    public TopBarActor(String buisnessName, int money, int time){
+    public TopBarActor(String buisnessName){
         this.buisnessName = buisnessName;
-        this.money = money;
-        this.time = time;
-        moneyLabel = new VisLabel(money + "");
+        moneyLabel = new VisLabel();
 
         timeState = new VisImage();
         slowTime  = new VisImage(SiliconTycoon.getInstance().repository.slow);
@@ -38,8 +33,8 @@ public class TopBarActor extends VisTable {
         quickTime = new VisImage(SiliconTycoon.getInstance().repository.quick);
 
         VisTable moneyTable = new VisTable();
-        moneyTable.add(new VisImage(SiliconTycoon.getInstance().repository.silicoin)).size(30,30).pad(0).padRight(10);
-        moneyTable.add(moneyLabel);
+        moneyTable.add(moneyLabel).pad(0).padRight(10);
+        moneyTable.add(new VisImage(SiliconTycoon.getInstance().repository.silicoin)).size(30,30);
 
         container = new VisTable();
         container.add(new VisLabel(buisnessName)).padRight(10);
@@ -67,7 +62,6 @@ public class TopBarActor extends VisTable {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 toggleTimeState();
-                System.out.println("Nice!");
             }
         });
 
@@ -101,6 +95,8 @@ public class TopBarActor extends VisTable {
         if(((int)SiliconTycoon.getInstance().gameScreen.getState().stepTime - 5) % 5 == 0) t5.white();
         else                                                                               t5.grey();
 
+        moneyLabel.setText(SiliconTycoon.getInstance().gameScreen.getState().money + "");
+
         if(SiliconTycoon.getInstance().gameScreen.getState().quickTime) SiliconTycoon.getInstance().gameScreen.getState().stepMul = 3;
         else      SiliconTycoon.getInstance().gameScreen.getState().stepMul = 1;
         if(SiliconTycoon.getInstance().gameScreen.getState().pauseTime) SiliconTycoon.getInstance().gameScreen.getState().stepMul = 0;
@@ -125,28 +121,12 @@ public class TopBarActor extends VisTable {
         return style;
     }
 
-    public int getMoney() {
-        return money;
-    }
-
-    public int getTime() {
-        return time;
-    }
-
     public String getBuisnessName() {
         return buisnessName;
     }
 
     public void setBuisnessName(String buisnessName) {
         this.buisnessName = buisnessName;
-    }
-
-    public void setMoney(int money) {
-        this.money = money;
-    }
-
-    public void setTime(int time) {
-        this.time = time;
     }
 
     static public class TopBarStyle {

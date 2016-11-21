@@ -18,6 +18,7 @@ public class STRepository {
     public Texture slow;
     public Texture quick;
     public Texture pause;
+    public Texture temp_tile_test;
 
     public void loadAll(){
         logo                  = new Texture("gui/logo.png");
@@ -35,6 +36,7 @@ public class STRepository {
         slow                  = new Texture("slow.png");
         quick                 = new Texture("quick.png");
         pause                 = new Texture("pause.png");
+        temp_tile_test        = new Texture("tiles/test.png");
 
         server_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         buildings_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
@@ -53,5 +55,6 @@ public class STRepository {
         silicoin.dispose();
         whitedot.dispose();
         greydot.dispose();
+        temp_tile_test.dispose();
     }
 }

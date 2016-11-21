@@ -14,11 +14,14 @@ import org.apache.commons.io.FileUtils;
 // Serializable class for saving values to disk, contains save-specific info
 public class STSaveState {
     private static Json json = new Json();
-    private String saveName;
+    public String saveName;
 
     public Date lastLoaded;
     public List<Alert> alerts;
     public String username;
+
+    // Yes, this is the field you're looking for. You dirty cheater ;)
+    public int money;
 
     public float stepTime;
     public float stepMul;

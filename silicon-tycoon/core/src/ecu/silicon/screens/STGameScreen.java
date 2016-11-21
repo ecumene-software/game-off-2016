@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Align;
@@ -17,8 +18,10 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 import ecu.silicon.events.STEvent;
 import ecu.silicon.gui.*;
+import ecu.silicon.models.ITile;
 import ecu.silicon.models.STSaveState;
 import ecu.silicon.SiliconTycoon;
+import ecu.silicon.models.TileMap;
 import ecu.silicon.models.advisors.Advice;
 import ecu.silicon.models.advisors.BuisnessAdvisor;
 import ecu.silicon.models.advisors.LegalAdvisor;
@@ -44,6 +47,8 @@ public class STGameScreen implements Screen {
 
     private Bus gameBus;
 
+    private TileMap buildingMap;
+
     public STGameScreen(STSaveState save, boolean firstTime) {
         this.state = save;
         gameBus = new Bus(ThreadEnforcer.ANY);
@@ -64,7 +69,7 @@ public class STGameScreen implements Screen {
 
         gui.addActor(alertsWindow);
 
-        final TopBarActor bar = new TopBarActor("Test", 100, 100).setStyle(VisUI.getSkin().get("default", TopBarActor.TopBarStyle.class));
+        final TopBarActor bar = new TopBarActor(getState().saveName).setStyle(VisUI.getSkin().get("default", TopBarActor.TopBarStyle.class));
         gui.addActor(bar);
 
         gameInput = new InputAdapter(){
@@ -89,6 +94,14 @@ public class STGameScreen implements Screen {
         techAdvisor.initSubscribe();
         buisnessAdvisor.initSubscribe();
         legalAdvisor.initSubscribe();
+
+        buildingMap = new TileMap(1,1);
+        buildingMap.setAt(0, 0, new ITile() {
+            @Override
+            public Texture getTexture() {
+                return SiliconTycoon.getInstance().repository.temp_tile_test;
+            }
+        });
     }
 
     public void postConstruct(){
@@ -135,6 +148,10 @@ public class STGameScreen implements Screen {
         this.state.stepTime += delta * getState().stepMul;
 
         gui.act(delta);
+
+        int tileScale = 25;
+        buildingMap.render(SiliconTycoon.getInstance().batch, tileScale, -(buildingMap.getTiles().length*tileScale)/2, -(buildingMap.getTiles()[0].length*tileScale)/2);
+
         gui.draw();
     }
 
@@ -161,7 +178,6 @@ public class STGameScreen implements Screen {
         alertsWindow.setTarget(new Vector2(Gdx.graphics.getWidth()+alertsWindow.getWidth(), Gdx.graphics.getHeight()/2 - alertsWindow.getHeight()/2));
         alertsWindow.bounce();
         alertsWindow.setDisabled(true);
-
     }
 
     public STSaveState getState() {

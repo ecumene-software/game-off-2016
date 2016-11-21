@@ -74,10 +74,10 @@ public class STMenuScreen implements Screen {
                             CenterVisWindow usernameWindow = new CenterVisWindow("New Game");
                             usernameWindow.add(new VisLabel("username:"));
                             usernameWindow.add(username).row();
-                            usernameWindow.add(new VisLabel("save location:"));
+                            usernameWindow.add(new VisLabel("business name (save file):"));
                             usernameWindow.add(saveName).row();
                             usernameWindow.add(createButton);
-                            usernameWindow.setSize(300, 200);
+                            usernameWindow.setSize(400, 200);
                             usernameWindow.closeOnEscape();
                             usernameWindow.addCloseButton();
                             usernameWindow.setCloseListener(new CloseListener() {

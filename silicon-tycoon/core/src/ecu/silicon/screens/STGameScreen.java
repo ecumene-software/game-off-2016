@@ -49,6 +49,8 @@ public class STGameScreen implements Screen {
 
     private TileMap buildingMap;
 
+    private Road road;
+
     public STGameScreen(STSaveState save, boolean firstTime) {
         this.state = save;
         gameBus = new Bus(ThreadEnforcer.ANY);
@@ -95,13 +97,20 @@ public class STGameScreen implements Screen {
         buisnessAdvisor.initSubscribe();
         legalAdvisor.initSubscribe();
 
-        buildingMap = new TileMap(1,1);
-        buildingMap.setAt(0, 0, new ITile() {
-            @Override
-            public Texture getTexture() {
-                return SiliconTycoon.getInstance().repository.temp_tile_test;
+        buildingMap = new TileMap(10,10);
+
+        for(int x = 0; x < 10; x++){
+            for(int y = 0; y < 10; y++){
+                buildingMap.setAt(x, y, new ITile() {
+                    @Override
+                    public Texture getTexture() {
+                        return SiliconTycoon.getInstance().repository.temp_tile_test;
+                    }
+                });
             }
-        });
+        }
+
+        road = new Road();
     }
 
     public void postConstruct(){
@@ -149,10 +158,16 @@ public class STGameScreen implements Screen {
 
         gui.act(delta);
 
-        int tileScale = 25;
-        buildingMap.render(SiliconTycoon.getInstance().batch, tileScale, -(buildingMap.getTiles().length*tileScale)/2, -(buildingMap.getTiles()[0].length*tileScale)/2);
+        int tileScale = 30;
+        int tileSizeX = (buildingMap.getTiles().length*tileScale);
+        int tileSizeY = (buildingMap.getTiles()[0].length*tileScale);
+
+        buildingMap.render(SiliconTycoon.getInstance().batch, tileScale, -tileSizeX/2, -tileSizeY/2);
+
+        road.render(SiliconTycoon.getInstance().batch, -(tileSizeX)/2 - road.getHeight(), -(tileSizeY/2) - road.getHeight(), (tileSizeX) + road.getHeight(), (tileSizeY) + road.getHeight());
 
         gui.draw();
+
     }
 
     @Override

@@ -20,6 +20,10 @@ public class STRepository {
     public Texture pause;
     public Texture temp_tile_test;
 
+    public Texture road_middle;
+    public Texture road_crossing;
+    public Texture road_corner;
+
     public void loadAll(){
         logo                  = new Texture("gui/logo.png");
         server_background     = new Texture("gui/menu/server-rack.png");
@@ -38,8 +42,13 @@ public class STRepository {
         pause                 = new Texture("pause.png");
         temp_tile_test        = new Texture("tiles/test.png");
 
+        road_middle           = new Texture("roads/road-straight.png");
+        road_corner           = new Texture("roads/road-cross.png");
+        road_crossing         = new Texture("roads/road-crossing.png");
+
         server_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         buildings_background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        road_middle.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
     }
 
     public void dispose(){
@@ -56,5 +65,9 @@ public class STRepository {
         whitedot.dispose();
         greydot.dispose();
         temp_tile_test.dispose();
+
+        road_middle.dispose();
+        road_corner.dispose();
+        road_crossing.dispose();
     }
 }

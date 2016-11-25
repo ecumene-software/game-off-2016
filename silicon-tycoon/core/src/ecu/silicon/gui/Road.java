@@ -34,8 +34,8 @@ public class Road {
         for(int tx = 1; tx < (width/getHeight()); tx++)  batch.draw(straight, (x + tx*getHeight()), (y));
         for(int tx = 1; tx < (width/getHeight()); tx++)  batch.draw(straight, (x + tx*getHeight()), -(y+getHeight()));
         //TextureRegion region, float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation
-        for(int ty = 1; ty < (height/getHeight()); ty++) batch.draw(new TextureRegion(straight),  (x), (y + ty*getHeight()), 0, 0, getHeight(), getHeight(), 1, 1, 90);
-        for(int ty = 1; ty < (height/getHeight()); ty++) batch.draw(new TextureRegion(straight), -(x),             (y + ty*getHeight()), 0, 0, getHeight(), getHeight(), 1, 1, -90);
+        for(int ty = 1; ty < (height/getHeight()); ty++) batch.draw(new TextureRegion(straight),  (x+getHeight()), (y + ty*getHeight()), 0, 0, getHeight(), getHeight(), 1, 1, 90);
+        for(int ty = 1; ty < (height/getHeight()); ty++) batch.draw(new TextureRegion(straight), -(x+getHeight()), (y + (ty+1)*getHeight()), 0, 0, getHeight(), getHeight(), 1, 1, -90);
 
         batch.end();
     }

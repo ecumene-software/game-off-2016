@@ -9,6 +9,8 @@ import java.util.List;
 
 import com.badlogic.gdx.utils.Json;
 import ecu.silicon.models.alerts.Alert;
+import ecu.silicon.models.tiles.TileData;
+import ecu.silicon.models.tiles.TileMap;
 import org.apache.commons.io.FileUtils;
 
 // Serializable class for saving values to disk, contains save-specific info
@@ -20,6 +22,8 @@ public class STSaveState {
     public List<Alert> alerts;
     public String username;
 
+    public TileMap tileMap;
+
     // Yes, this is the field you're looking for. You dirty cheater ;)
     public int money;
 
@@ -28,9 +32,16 @@ public class STSaveState {
     public boolean quickTime;
     public boolean pauseTime;
 
+    public float cameraX, cameraY;
+    public float zoom = 1;
+
     @Deprecated
     public STSaveState(){
         alerts = new ArrayList<Alert>();
+        tileMap = new TileMap(30, 30);
+        for(int x = 0; x < tileMap.getTiles().length; x++)
+            for(int y = 0; y < tileMap.getTiles()[0].length; y++)
+                tileMap.getTiles()[x][y] = new TileData("", "t_greyFloor");
     }
 
     public STSaveState(String username, String saveName){

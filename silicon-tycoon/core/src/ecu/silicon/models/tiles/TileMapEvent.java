@@ -1,4 +1,4 @@
-package ecu.silicon.models.tile;
+package ecu.silicon.models.tiles;
 
 public class TileMapEvent {
     public Object object;

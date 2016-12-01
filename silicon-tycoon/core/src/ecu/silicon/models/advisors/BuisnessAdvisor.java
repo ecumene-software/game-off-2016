@@ -10,8 +10,9 @@ public class BuisnessAdvisor implements Advisor{
     }
 
     @Override
+    // The only place it's spelled right, get off my back??
     public String getType() {
-        return "Buisness";
+        return "Business";
     }
 
     @Override

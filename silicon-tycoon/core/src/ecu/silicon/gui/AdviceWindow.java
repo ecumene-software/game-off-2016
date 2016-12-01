@@ -14,6 +14,6 @@ public class AdviceWindow extends VisWindow {
     @Override
     public void act(float delta) {
         super.act(delta);
-        setPosition(Gdx.graphics.getWidth()/2 - getWidth()/2, Gdx.graphics.getHeight() - getHeight());
+        setPosition(Gdx.graphics.getWidth()/2 - getWidth()/2, Gdx.graphics.getHeight() - getHeight() - 40);
     }
 }

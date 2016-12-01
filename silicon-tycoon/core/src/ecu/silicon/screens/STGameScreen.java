@@ -1,12 +1,7 @@
 package ecu.silicon.screens;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Align;
@@ -16,12 +11,15 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisScrollPane;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
+import ecu.silicon.STCamera;
 import ecu.silicon.events.STEvent;
 import ecu.silicon.gui.*;
-import ecu.silicon.models.ITile;
+import ecu.silicon.gui.tile.TileMapControl;
+import ecu.silicon.gui.tile.TileMapRenderer;
 import ecu.silicon.models.STSaveState;
 import ecu.silicon.SiliconTycoon;
-import ecu.silicon.models.TileMap;
+import ecu.silicon.models.tiles.TileData;
+import ecu.silicon.models.tiles.TileMap;
 import ecu.silicon.models.advisors.Advice;
 import ecu.silicon.models.advisors.BuisnessAdvisor;
 import ecu.silicon.models.advisors.LegalAdvisor;
@@ -30,14 +28,17 @@ import ecu.silicon.models.alerts.Alert;
 
 public class STGameScreen implements Screen {
 
-    private OrthographicCamera camera;
+    private STCamera camera;
 
     private Stage gui;
     private AlertsWindow alertsWindow;
     private AlertsVisTable alertsGUI;
+    private ConstructionWindow constructionWindow;
+    private ConstructionVisTable constructionGUI;
+    private TopBarActor bar;
 
-    private InputAdapter gameInput;
-    private boolean      firstTime;
+    private STInputProcessor gameInput;
+    private boolean          firstTime;
 
     private STSaveState state;
 
@@ -47,9 +48,9 @@ public class STGameScreen implements Screen {
 
     private Bus gameBus;
 
-    private TileMap buildingMap;
-
+    private TileMapRenderer buildingMapRenderer;
     private Road road;
+    private TileMapControl tileMapControl;
 
     public STGameScreen(STSaveState save, boolean firstTime) {
         this.state = save;
@@ -69,25 +70,25 @@ public class STGameScreen implements Screen {
         alertsWindow.setKeepWithinParent(false);
         alertsWindow.setKeepWithinStage(false);
 
-        gui.addActor(alertsWindow);
+        constructionGUI = new ConstructionVisTable();
+        constructionWindow = new ConstructionWindow("", new Vector2(), new Vector2(100, 100));
+        constructionWindow.setWidth(200);
+        constructionWindow.add(constructionGUI).grow().align(Align.top);
+        constructionWindow.setKeepWithinParent(false);
+        constructionWindow.setKeepWithinStage(false);
 
-        final TopBarActor bar = new TopBarActor(getState().saveName).setStyle(VisUI.getSkin().get("default", TopBarActor.TopBarStyle.class));
+        gui.addActor(alertsWindow);
+        gui.addActor(constructionWindow);
+
+        bar = new TopBarActor(getState().saveName).setStyle(VisUI.getSkin().get("default", TopBarActor.TopBarStyle.class));
         gui.addActor(bar);
 
-        gameInput = new InputAdapter(){
-            @Override
-            public boolean keyTyped(char character) {
-                if(character == '\t'){
-                    if(!alertsWindow.isVisible()) alertsWindow.setVisible(true);
-                    if(alertsWindow.isDisabled()) openAlerts();
-                    else                          closeAlerts();
-                }
-                if(character == ' ') bar.togglePause();
-                return super.keyTyped(character);
-            }
-        };
+        gameInput = new STInputProcessor();
+
         closeAlerts();
+        closeConstruction();
         alertsWindow.setVisible(false);
+        constructionWindow.setVisible(false);
 
         techAdvisor = new TechAdvisor();
         buisnessAdvisor = new BuisnessAdvisor();
@@ -97,20 +98,9 @@ public class STGameScreen implements Screen {
         buisnessAdvisor.initSubscribe();
         legalAdvisor.initSubscribe();
 
-        buildingMap = new TileMap(10,10);
-
-        for(int x = 0; x < 10; x++){
-            for(int y = 0; y < 10; y++){
-                buildingMap.setAt(x, y, new ITile() {
-                    @Override
-                    public Texture getTexture() {
-                        return SiliconTycoon.getInstance().repository.temp_tile_test;
-                    }
-                });
-            }
-        }
-
         road = new Road();
+
+        tileMapControl = new TileMapControl(state.tileMap, buildingMapRenderer = new TileMapRenderer(state.tileMap), road);
     }
 
     public void postConstruct(){
@@ -149,35 +139,36 @@ public class STGameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        SiliconTycoon.getInstance().batch.setProjectionMatrix(camera.combined);
-
         Gdx.gl.glClearColor(135f/255f, 206f/255f, 235f/255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        SiliconTycoon.getInstance().batch.setProjectionMatrix(camera.combined);
 
         this.state.stepTime += delta * getState().stepMul;
 
+        gameInput.onRender(delta);
+
+        camera.zoom += (state.zoom - camera.zoom) * 8 * delta;
+        camera.x += (state.cameraX - camera.x) * 12 * delta;
+        camera.y += (state.cameraY - camera.y) * 12 * delta;
+
+        camera.update();
+        tileMapControl.render(SiliconTycoon.getInstance().batch);
+
         gui.act(delta);
-
-        int tileScale = 30;
-        int tileSizeX = (buildingMap.getTiles().length*tileScale);
-        int tileSizeY = (buildingMap.getTiles()[0].length*tileScale);
-
-        buildingMap.render(SiliconTycoon.getInstance().batch, tileScale, -tileSizeX/2, -tileSizeY/2);
-
-        road.render(SiliconTycoon.getInstance().batch, -(tileSizeX)/2 - road.getHeight(), -(tileSizeY/2) - road.getHeight(), (tileSizeX) + road.getHeight(), (tileSizeY) + road.getHeight());
-
         gui.draw();
-
     }
 
     @Override
     public void resize(int width, int height) {
-        camera = new OrthographicCamera(width, height);
-        camera.update();
+        camera = new STCamera(width, height);
         gui.getViewport().update(width, height, true);
+
         alertsWindow.setHeight(height * 0.8f);
         if(!alertsWindow.isDisabled())
             alertsWindow.setPosition(Gdx.graphics.getWidth()-alertsWindow.getWidth(), Gdx.graphics.getHeight()/2 - alertsWindow.getHeight()/2);
+        constructionWindow.setHeight(height * 0.8f);
+        if(!constructionWindow.isDisabled())
+            constructionWindow.setPosition(0, Gdx.graphics.getHeight()/2 - constructionWindow.getHeight()/2);
     }
 
     public void openAlerts(){
@@ -195,8 +186,38 @@ public class STGameScreen implements Screen {
         alertsWindow.setDisabled(true);
     }
 
+    public void openConstruction(){
+        constructionWindow.setStarting(new Vector2(-constructionWindow.getWidth(), Gdx.graphics.getHeight()/2 - constructionWindow.getHeight()/2));
+        constructionWindow.setTarget(new Vector2(0, Gdx.graphics.getHeight()/2 - constructionWindow.getHeight()/2));
+        constructionWindow.bounce();
+        constructionWindow.setDisabled(false);
+    }
+
+    public void closeConstruction(){
+        constructionWindow.setStarting(new Vector2(0, Gdx.graphics.getHeight()/2 - constructionWindow.getHeight()/2));
+        constructionWindow.setTarget(new Vector2(-constructionWindow.getWidth(), Gdx.graphics.getHeight()/2 - constructionWindow.getHeight()/2));
+        constructionWindow.bounce();
+        constructionWindow.setDisabled(true);
+    }
+
     public STSaveState getState() {
         return state;
+    }
+
+    public STCamera getCamera() {
+        return camera;
+    }
+
+    public STInputProcessor getGameInput() {
+        return gameInput;
+    }
+
+    public TileMapControl getTileMapControl() {
+        return tileMapControl;
+    }
+
+    public Bus getBus() {
+        return gameBus;
     }
 
     @Override
@@ -211,7 +232,7 @@ public class STGameScreen implements Screen {
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(new InputMultiplexer(gameInput, gui));
+        Gdx.input.setInputProcessor(new InputMultiplexer(gameInput, gui, tileMapControl, buildingMapRenderer));
     }
 
     @Override
@@ -231,6 +252,10 @@ public class STGameScreen implements Screen {
         return techAdvisor;
     }
 
+    public TileMapRenderer getTileRenderer() {
+        return buildingMapRenderer;
+    }
+
     @Override
     public void dispose() {
         techAdvisor.initUnsubscribe();
@@ -238,9 +263,80 @@ public class STGameScreen implements Screen {
         legalAdvisor.initUnsubscribe();
 
         try{
-            STSaveState.save(state);
         } catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    public class STInputProcessor implements InputProcessor {
+        private boolean up,down,left,right;
+
+        @Override
+        public boolean keyTyped(char character) {
+            if(character == '\t'){
+                if(!alertsWindow.isVisible()) alertsWindow.setVisible(true);
+                if(alertsWindow.isDisabled()) openAlerts();
+                else                          closeAlerts();
+            }
+            if(character == 't'){
+                if(!constructionWindow.isVisible()) constructionWindow.setVisible(true);
+                if(constructionWindow.isDisabled()) openConstruction();
+                else                                closeConstruction();
+            }
+            if(character == ' ') bar.togglePause();
+            return false;
+        }
+
+        @Override
+        public boolean keyUp(int keycode) {
+            if(keycode == Input.Keys.W) up = false;
+            if(keycode == Input.Keys.S) down = false;
+            if(keycode == Input.Keys.D) left = false;
+            if(keycode == Input.Keys.A) right = false;
+            return false;
+        }
+
+        @Override
+        public boolean keyDown(int keycode) {
+            up    = keycode == Input.Keys.W;
+            down  = keycode == Input.Keys.S;
+            left  = keycode == Input.Keys.D;
+            right = keycode == Input.Keys.A;
+            return false;
+        }
+
+        @Override
+        public boolean scrolled(int amount) {
+            state.zoom += amount*0.10f;
+            return false;
+        }
+
+        @Override
+        public boolean mouseMoved(int screenX, int screenY) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDragged(int screenX, int screenY, int pointer) {
+            return false;
+        }
+
+        public void onRender(float delta){
+            float frameSpeed = 10;
+            if(up)    state.cameraY -= frameSpeed;
+            if(down)  state.cameraY += frameSpeed;
+            if(right) state.cameraX += frameSpeed;
+            if(left)  state.cameraX -= frameSpeed;
         }
     }
 }

@@ -1,7 +1,7 @@
 # Mitchell Hynes - Game Off 2016
 
-[!imgur](https://i.imgur.com/wNXgDNH.png)
-[!imgur](https://i.imgur.com/aCBvFyA.png)
+![imgur](https://i.imgur.com/wNXgDNH.png)
+![imgur](https://i.imgur.com/aCBvFyA.png)
 
 Silicon Tycoon is a game about running and maintaining a technology buisness. You must lie, steal, and cheat to get to the top!
 
